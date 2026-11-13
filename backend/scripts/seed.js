@@ -11,14 +11,16 @@ const file = process.env.DB_FILE || path.resolve('data/lastcall.db');
 for (const f of [file, `${file}-wal`, `${file}-shm`]) fs.rmSync(f, { force: true });
 
 const db = openDb(file);
-let now = Date.now();
+// Anchor everything to a whole minute so the seeded times read cleanly.
+const BASE = Math.floor(Date.now() / MIN) * MIN;
+let now = BASE;
 const service = createAuctionService({ db, clock: () => now });
 
 const iso = (ms) => new Date(ms).toISOString();
 const day = (offsetDays) => new Date(Date.now() + offsetDays * 86_400_000).toISOString().slice(0, 10);
 
 function auction({ ref, name, startOffset, closeAfter, forcedAfter, X, Y, trigger, pickupIn }) {
-  const start = Date.now() + startOffset * MIN;
+  const start = BASE + startOffset * MIN;
   now = Math.min(start, Date.now());
   return service.createRfq({
     name, referenceId: ref, bidStartAt: iso(start), bidCloseAt: iso(start + closeAfter * MIN),
