@@ -21,6 +21,7 @@ export default function QuoteForm({ rfq, disabled, onSubmitted }) {
   const set = (k) => (e) => {
     setForm((f) => ({ ...f, [k]: e.target.value }));
     setErrors((er) => ({ ...er, [k]: undefined }));
+    setMsg(null); // a fresh edit means the last result no longer applies
   };
   const rupees = (v) => (v === '' ? 0 : Number(v) || 0);
   const total = rupees(form.freightCharges) + rupees(form.originCharges) + rupees(form.destinationCharges);
